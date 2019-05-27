@@ -10,8 +10,6 @@ const (
 	BagitVer = "0.97"
 	// TagFileCharEnc is the encoding of the tag files
 	TagFileCharEnc = "UTF-8"
-	// Oxum is the octetstream sum and contains the sum of all bytes and files
-	Oxum = "0.0"
 )
 
 // Bagit is a struct that describes a bag
@@ -19,6 +17,7 @@ type Bagit struct {
 	Timestamp time.Time
 	Hashfunc  crypto.Hash
 	Bagname   string
+	Oxum      string
 }
 
 // New creates a new Bagit struct

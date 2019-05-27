@@ -1,7 +1,14 @@
 package main
 
-import "github.com/steffenfritz/bagit"
+import (
+	"flag"
+
+	_ "github.com/steffenfritz/bagit"
+)
 
 func main() {
-	b := bagit.New()
+
+	sourcePath := flag.String("source", "", "Source directory for creating a bag")
+
+	flag.Parse()
 }
