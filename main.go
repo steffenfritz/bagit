@@ -14,7 +14,7 @@ const (
 
 // Bagit is a struct that describes a bag
 type Bagit struct {
-	Timestamp time.Time
+	Timestamp string
 	Hashfunc  crypto.Hash
 	Bagname   string
 	Oxum      string
@@ -23,16 +23,21 @@ type Bagit struct {
 // New creates a new Bagit struct
 func New() *Bagit {
 	return &Bagit{
-		Timestamp: time.Now(),
+		Timestamp: time.Now().Format("2006-01-02T15:04:05"),
 	}
 }
 
 // Create creates a new bagit archive
-func (b *Bagit) Create() error {
+func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 	return nil
 }
 
 // Validate validates a bag for completeness and correctness
 func (b *Bagit) Validate() error {
+	return nil
+}
+
+// Tarit tars a directory
+func (b *Bagit) Tarit() error {
 	return nil
 }
