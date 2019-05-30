@@ -2,6 +2,8 @@ package bagit
 
 import (
 	"crypto"
+	"log"
+	"os"
 	"time"
 )
 
@@ -29,6 +31,23 @@ func New() *Bagit {
 
 // Create creates a new bagit archive
 func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
+	// create bagit directory
+	err := os.Mkdir(outDir, 0700)
+	e(err)
+
+	// create payload dir
+	err = os.Mkdir(outDir+"/data", 0700)
+	e(err)
+
+	// create bagit.txt tag file
+	fd, err := os.Create(outDir + "/bagit.txt")
+	e(err)
+
+	_, err = fd.WriteString("BagIt-Version: " + BagitVer + "\n")
+	e(err)
+	_, err = fd.WriteString("Tag-File-Character-Encoding: " + TagFileCharEnc)
+	e(err)
+
 	return nil
 }
 
@@ -40,4 +59,11 @@ func (b *Bagit) Validate() error {
 // Tarit tars a directory
 func (b *Bagit) Tarit() error {
 	return nil
+}
+
+// e is just a shorty for generic errors and panics
+func e(err error) {
+	if err != nil {
+		log.Panicln(err)
+	}
 }
