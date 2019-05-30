@@ -2,8 +2,10 @@ package bagit
 
 import (
 	"crypto"
+	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"time"
 )
 
@@ -31,6 +33,14 @@ func New() *Bagit {
 
 // Create creates a new bagit archive
 func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
+
+	if hashalg == "md5" {
+		log.Println("WARNING: md5 has known collisions. You should not use md5.")
+		log.Println("WARNING: Press Ctrl + C to cancel or wait 5 seconds to continue...")
+		time.Sleep(5 * time.Second)
+	}
+	//filehashmap := make(map[string]string)
+
 	// create bagit directory
 	err := os.Mkdir(outDir, 0700)
 	e(err)
@@ -42,10 +52,21 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 	// create bagit.txt tag file
 	fd, err := os.Create(outDir + "/bagit.txt")
 	e(err)
+	defer fd.Close()
+
+	fe, err := os.Create(outDir + "/manifest-" + hashalg + ".txt")
+	e(err)
+	defer fe.Close()
 
 	_, err = fd.WriteString("BagIt-Version: " + BagitVer + "\n")
 	e(err)
 	_, err = fd.WriteString("Tag-File-Character-Encoding: " + TagFileCharEnc)
+	e(err)
+
+	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		fmt.Println(path)
+		return nil
+	})
 	e(err)
 
 	return nil
