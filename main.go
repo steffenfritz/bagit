@@ -64,7 +64,9 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 	e(err)
 
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
-		fmt.Println(path)
+		if !info.IsDir() {
+			fmt.Println(hashit(path, hashalg))
+		}
 		return nil
 	})
 	e(err)
@@ -80,11 +82,4 @@ func (b *Bagit) Validate() error {
 // Tarit tars a directory
 func (b *Bagit) Tarit() error {
 	return nil
-}
-
-// e is just a shorty for generic errors and panics
-func e(err error) {
-	if err != nil {
-		log.Panicln(err)
-	}
 }
