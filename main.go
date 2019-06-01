@@ -2,7 +2,7 @@ package bagit
 
 import (
 	"crypto"
-	"fmt"
+	"encoding/hex"
 	"log"
 	"os"
 	"path/filepath"
@@ -63,9 +63,15 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 	_, err = fd.WriteString("Tag-File-Character-Encoding: " + TagFileCharEnc)
 	e(err)
 
+	fm, err := os.Create(outDir + "/manifest-" + hashalg + ".txt")
+	e(err)
+	defer fm.Close()
+
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			fmt.Println(hashit(path, hashalg))
+			_, err = fm.WriteString(hex.EncodeToString(hashit(path, hashalg)) + " " + path + "\n")
+			// NEXT
+			copy(path, outDir+"/data/"+)
 		}
 		return nil
 	})
