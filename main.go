@@ -72,9 +72,9 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 			_, err = fm.WriteString(hex.EncodeToString(hashit(path, hashalg)) + " " + path + "\n")
 			// NEXT
 
-			copy(path, outDir+"/data"+path)
+			copy(path, outDir+"/data/"+path)
 		} else {
-			os.MkdirAll(outDir+"/data"+path, 0700)
+			os.MkdirAll(outDir+"/data/"+path, 0700)
 		}
 		return nil
 	})
