@@ -30,7 +30,7 @@ func main() {
 
 	if len(*validate) != 0 {
 		b := bagit.New()
-		b.Validate()
+		b.Validate(*validate)
 
 		return
 	}

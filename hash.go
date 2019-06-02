@@ -45,6 +45,7 @@ func hashit(inFile string, hashalg string) []byte {
 		return checksum
 	} else {
 		log.Println("Hash not implemented")
+		os.Exit(1)
 	}
 
 	return nil

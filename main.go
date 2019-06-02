@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -21,7 +23,13 @@ type Bagit struct {
 	Timestamp string
 	Hashfunc  crypto.Hash
 	Bagname   string
-	Oxum      string
+	Oxum      Oxum
+}
+
+// Oxum defnies a type that holds the sum of all bytes and files in the data dir
+type Oxum struct {
+	Bytes     int64
+	Filecount int
 }
 
 // New creates a new Bagit struct
@@ -39,7 +47,6 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 		log.Println("WARNING: Press Ctrl + C to cancel or wait 5 seconds to continue...")
 		time.Sleep(5 * time.Second)
 	}
-	//filehashmap := make(map[string]string)
 
 	// create bagit directory
 	err := os.Mkdir(outDir, 0700)
@@ -54,25 +61,30 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 	e(err)
 	defer fd.Close()
 
-	fe, err := os.Create(outDir + "/manifest-" + hashalg + ".txt")
-	e(err)
-	defer fe.Close()
-
 	_, err = fd.WriteString("BagIt-Version: " + BagitVer + "\n")
 	e(err)
 	_, err = fd.WriteString("Tag-File-Character-Encoding: " + TagFileCharEnc)
 	e(err)
 
+	// create manifest-ALG.txt file
 	fm, err := os.Create(outDir + "/manifest-" + hashalg + ".txt")
 	e(err)
 	defer fm.Close()
 
+	// create bag-info.txt file
+	fi, err := os.Create(outDir + "/bag-info.txt")
+	e(err)
+	defer fi.Close()
+
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
+			b.Oxum.Filecount += 1
+			fsize, err := os.Stat(path)
+			e(err)
+			b.Oxum.Bytes += fsize.Size()
 			_, err = fm.WriteString(hex.EncodeToString(hashit(path, hashalg)) + " " + path + "\n")
-			// NEXT
-
 			copy(path, outDir+"/data/"+path)
+
 		} else {
 			os.MkdirAll(outDir+"/data/"+path, 0700)
 		}
@@ -80,12 +92,60 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 	})
 	e(err)
 
+	// write bag-info.txt
+	oxumbytes := int(b.Oxum.Bytes)
+	_, err = fi.WriteString("Bag-Software-Agent: bagit <https://github.com/steffenfritz/bagit>\n")
+	_, err = fi.WriteString("Bagging-Date: " + b.Timestamp + "\n")
+	_, err = fi.WriteString("Payload-Oxum: " + strconv.Itoa(oxumbytes) + "." + strconv.Itoa(b.Oxum.Filecount) + "\n")
+
 	return nil
 }
 
 // Validate validates a bag for completeness and correctness
-func (b *Bagit) Validate() error {
+func (b *Bagit) Validate(srcDir string) error {
+	var hashalg string
+	var hashset bool
+
+	err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+		if strings.HasPrefix(info.Name(), "manifest-") {
+			if !hashset {
+				hashalg = strings.Split(strings.Split(info.Name(), "-")[1], ".")[0]
+				hashset = true
+			}
+		}
+		return nil
+	})
+	e(err)
+
+	// check oxum
+	_, err = os.Stat(srcDir + "/bag-info.txt")
+	if err == nil {
+		fd, err := os.Open(srcDir + "/bag-info.txt")
+		e(err)
+		fd.Close()
+		// ToDo OXUM auslesen
+	} else {
+		log.Println("No bag-info.txt file found")
+	}
+
+	// get files from manifest file and calculate hash sum of files in bag and get info for oxum compare
+	err = filepath.Walk(srcDir+"data/", func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			b.Oxum.Filecount += 1
+			fsize, err := os.Stat(path)
+			e(err)
+			b.Oxum.Bytes += fsize.Size()
+			hex.EncodeToString(hashit(path, hashalg))
+		}
+		return nil
+	})
+	e(err)
+
+	println(b.Oxum.Bytes)
+	println(b.Oxum.Filecount)
+
 	return nil
+
 }
 
 // Tarit tars a directory
