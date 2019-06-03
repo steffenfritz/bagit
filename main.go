@@ -1,6 +1,7 @@
 package bagit
 
 import (
+	"bufio"
 	"crypto"
 	"encoding/hex"
 	"log"
@@ -118,12 +119,19 @@ func (b *Bagit) Validate(srcDir string) error {
 	e(err)
 
 	// check oxum
+	var oxumread string
 	_, err = os.Stat(srcDir + "/bag-info.txt")
 	if err == nil {
 		fd, err := os.Open(srcDir + "/bag-info.txt")
 		e(err)
-		fd.Close()
-		// ToDo OXUM auslesen
+		defer fd.Close()
+		scanner := bufio.NewScanner(fd)
+		for scanner.Scan() {
+			if strings.HasPrefix(scanner.Text(), "Payload-Oxum:") {
+				oxumread = strings.TrimSpace(strings.Split(scanner.Text(), ":")[1])
+			}
+		}
+
 	} else {
 		log.Println("No bag-info.txt file found")
 	}
@@ -141,8 +149,13 @@ func (b *Bagit) Validate(srcDir string) error {
 	})
 	e(err)
 
-	println(b.Oxum.Bytes)
-	println(b.Oxum.Filecount)
+	oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(int(b.Oxum.Filecount))
+
+	if oxumcalculated == oxumread {
+		log.Println("Oxum valid")
+	} else {
+		log.Println("Oxum not valid")
+	}
 
 	return nil
 
