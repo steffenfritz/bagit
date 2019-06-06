@@ -106,17 +106,29 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 func (b *Bagit) Validate(srcDir string) error {
 	var hashalg string
 	var hashset bool
+	var manifestfile string
+	var bagvalid bool = true
 
 	err := filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasPrefix(info.Name(), "manifest-") {
 			if !hashset {
 				hashalg = strings.Split(strings.Split(info.Name(), "-")[1], ".")[0]
+				manifestfile = path
 				hashset = true
 			}
+		}
+		if hashset == false {
+			bagvalid = false
 		}
 		return nil
 	})
 	e(err)
+
+	if !hashset {
+		log.Println("No manifest file found")
+		log.Println("Bag not valid")
+		return nil
+	}
 
 	// check oxum
 	var oxumread string
@@ -136,14 +148,36 @@ func (b *Bagit) Validate(srcDir string) error {
 		log.Println("No bag-info.txt file found")
 	}
 
-	// get files from manifest file and calculate hash sum of files in bag and get info for oxum compare
+	fm, err := os.Open(manifestfile)
+	e(err)
+	defer fm.Close()
+
+	// walk through bag calculate hashes and look up result in manifest file and get info for oxum compare
 	err = filepath.Walk(srcDir+"data/", func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			b.Oxum.Filecount += 1
 			fsize, err := os.Stat(path)
 			e(err)
 			b.Oxum.Bytes += fsize.Size()
-			hex.EncodeToString(hashit(path, hashalg))
+
+			comppath := strings.SplitN(path, "/data/", 2)
+			scanner := bufio.NewScanner(fm)
+			fm.Seek(0, 0)
+			var hashcorrect bool
+			for scanner.Scan() {
+				if hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1] == scanner.Text() {
+					// debug
+					println(hex.EncodeToString(hashit(path, hashalg)) + " " + comppath[1])
+					println(scanner.Text())
+					hashcorrect = true
+				}
+
+			}
+			if !hashcorrect {
+				println("File " + path + " not in manifest file or wrong hashsum!")
+				bagvalid = false
+			}
+
 		}
 		return nil
 	})
@@ -151,10 +185,20 @@ func (b *Bagit) Validate(srcDir string) error {
 
 	oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(int(b.Oxum.Filecount))
 
+	println(oxumcalculated)
+	println(oxumread)
+
 	if oxumcalculated == oxumread {
 		log.Println("Oxum valid")
 	} else {
 		log.Println("Oxum not valid")
+		bagvalid = false
+	}
+
+	if bagvalid {
+		log.Println("Bag is valid.")
+	} else {
+		log.Println("Bag is not valid.")
 	}
 
 	return nil
