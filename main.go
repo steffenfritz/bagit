@@ -106,12 +106,13 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string) error {
 }
 
 // Validate validates a bag for completeness and correctness
-func (b *Bagit) Validate(srcDir string) error {
+func (b *Bagit) Validate(srcDir string, verbose bool) error {
 	var err error
 	var hashalg string
 	var hashset bool
 	var manifestfile string
 	var bagvalid bool = true
+	var checkoxum bool
 
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasPrefix(info.Name(), "manifest-") {
@@ -131,7 +132,14 @@ func (b *Bagit) Validate(srcDir string) error {
 		return err
 	}
 
+	if verbose {
+		log.Println("Used hash algorithm: " + hashalg)
+	}
+
 	// check oxum
+	if verbose {
+		log.Println("Looking for bag-info.txt file")
+	}
 	var oxumread string
 	_, err = os.Stat(srcDir + "/bag-info.txt")
 	if err == nil {
@@ -142,11 +150,13 @@ func (b *Bagit) Validate(srcDir string) error {
 		for scanner.Scan() {
 			if strings.HasPrefix(scanner.Text(), "Payload-Oxum:") {
 				oxumread = strings.TrimSpace(strings.Split(scanner.Text(), ":")[1])
+				checkoxum = true
 			}
 		}
 
 	} else {
 		log.Println("No bag-info.txt file found")
+
 	}
 
 	fm, err := os.Open(manifestfile)
@@ -154,6 +164,10 @@ func (b *Bagit) Validate(srcDir string) error {
 	defer fm.Close()
 
 	// walk through bag, calculate hashes and look up result in manifest file and get info for oxum compare
+	if verbose {
+		log.Println("Checking hashsums of files in payload directory")
+	}
+
 	err = filepath.Walk(srcDir+"data/", func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			b.Oxum.Filecount += 1
@@ -167,7 +181,6 @@ func (b *Bagit) Validate(srcDir string) error {
 			var hashcorrect bool
 			for scanner.Scan() {
 				if hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1] == scanner.Text() {
-					// debug
 					//println(hex.EncodeToString(hashit(path, hashalg)) + " " + comppath[1])
 					//println(scanner.Text())
 					hashcorrect = true
@@ -175,7 +188,7 @@ func (b *Bagit) Validate(srcDir string) error {
 
 			}
 			if !hashcorrect {
-				println("File " + path + " not in manifest file or wrong hashsum!")
+				log.Println("File " + path + " not in manifest file or wrong hashsum!")
 				bagvalid = false
 			}
 
@@ -184,15 +197,21 @@ func (b *Bagit) Validate(srcDir string) error {
 	})
 	e(err)
 
-	oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(int(b.Oxum.Filecount))
+	if checkoxum {
+		oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(int(b.Oxum.Filecount))
 
-	if oxumcalculated == oxumread {
-		log.Println("Oxum valid")
-	} else {
-		log.Println("Oxum not valid")
-		bagvalid = false
+		if oxumcalculated == oxumread {
+			log.Println("Oxum valid")
+		} else {
+			log.Println("Oxum not valid")
+			bagvalid = false
+		}
+
+		if verbose {
+			log.Println("Oxum in bag: \t" + oxumread)
+			log.Println("Oxum calculated: \t" + oxumcalculated)
+		}
 	}
-
 	if bagvalid == true {
 		log.Println("Bag is valid.")
 	} else {

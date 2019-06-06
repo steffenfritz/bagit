@@ -20,17 +20,19 @@ func main() {
 	outputDir := flag.String("output", "bag_"+starttime, "Output directory for bag. Used with create flag")
 	tarit := flag.Bool("tar", false, "Create a tar archive when creating a bag")
 	hashalg := flag.String("hash", "sha256", "Hash algorithm used for manifest file when creating a bag")
+	verbose := flag.Bool("v", false, "Verbose output")
 
 	flag.Parse()
 
 	if *vers {
 		log.Println("Version: " + version)
+
 		return
 	}
 
 	if len(*validate) != 0 {
 		b := bagit.New()
-		b.Validate(*validate)
+		b.Validate(*validate, *verbose)
 
 		return
 	}
