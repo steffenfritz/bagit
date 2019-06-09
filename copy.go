@@ -18,7 +18,6 @@ func copy(src, dst string) (int64, error) {
 	e(err)
 	defer source.Close()
 
-	println("DEBUG: " + dst)
 	destination, err := os.Create(dst)
 	e(err)
 	defer destination.Close()
