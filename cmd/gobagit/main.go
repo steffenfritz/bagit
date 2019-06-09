@@ -21,6 +21,7 @@ func main() {
 	tarit := flag.Bool("tar", false, "Create a tar archive when creating a bag")
 	hashalg := flag.String("hash", "sha256", "Hash algorithm used for manifest file when creating a bag [sha1, sha256, md5]")
 	verbose := flag.Bool("v", false, "Verbose output")
+	addHeader := flag.String("H", "", "Additional headers for bag-info.txt. Expects path to json file")
 
 	flag.Parse()
 
@@ -39,7 +40,7 @@ func main() {
 
 	if len(*createSrc) != 0 {
 		b := bagit.New()
-		b.Create(*createSrc, *outputDir, *hashalg)
+		b.Create(*createSrc, *outputDir, *hashalg, *addHeader)
 
 		if *tarit {
 			b.Tarit(*outputDir, *outputDir+".tar.gz")

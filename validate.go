@@ -16,8 +16,8 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 	var hashalg string
 	var hashset bool
 	var manifestfile string
-	var bagvalid bool = true
 	var checkoxum bool
+	bagvalid := true
 
 	// filepath expects backslash
 	if !strings.HasSuffix(srcDir, "/") {
@@ -80,7 +80,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 
 	err = filepath.Walk(srcDir+"data/", func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
-			b.Oxum.Filecount += 1
+			b.Oxum.Filecount++
 			fsize, err := os.Stat(path)
 			e(err)
 			b.Oxum.Bytes += fsize.Size()
