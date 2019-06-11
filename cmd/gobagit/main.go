@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"os"
 	"time"
 
 	"github.com/steffenfritz/bagit"
@@ -39,6 +40,18 @@ func main() {
 	}
 
 	if len(*createSrc) != 0 {
+		_, err := os.Stat(*createSrc)
+		if err != nil {
+			log.Println("Cannot read source directory")
+			return
+		}
+
+		_, err = os.Stat(*outputDir)
+		if err == nil {
+			log.Println("Output directory already exists. Refusing to overwrite.")
+			return
+		}
+
 		b := bagit.New()
 		b.Create(*createSrc, *outputDir, *hashalg, *addHeader)
 

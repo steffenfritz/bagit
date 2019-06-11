@@ -45,13 +45,6 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 	_, err = fd.WriteString("Tag-File-Character-Encoding: " + TagFileCharEnc)
 	e(err)
 
-	// add additional headers to bag-info.txt
-	if len(mapheader) != 0 {
-		for k, v := range mapheader {
-			println(mapheader[k])
-			println(v)
-		}
-	}
 	// create manifest-ALG.txt file
 	fm, err := os.Create(outDir + "/manifest-" + hashalg + ".txt")
 	e(err)
@@ -84,6 +77,13 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 	_, err = fi.WriteString("Bag-Software-Agent: bagit <https://github.com/steffenfritz/bagit>\n")
 	_, err = fi.WriteString("Bagging-Date: " + b.Timestamp + "\n")
 	_, err = fi.WriteString("Payload-Oxum: " + strconv.Itoa(oxumbytes) + "." + strconv.Itoa(b.Oxum.Filecount) + "\n")
+
+	// add additional headers to bag-info.txt
+	if len(mapheader) != 0 {
+		for k, v := range mapheader {
+			_, err = fi.WriteString(k + ": " + v.(string) + "\n")
+		}
+	}
 
 	return err
 }
