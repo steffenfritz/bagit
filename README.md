@@ -25,11 +25,9 @@ Create a bag with all possible commandline options
     gobagit -create testinputdir -output outbagdir -tar -hash sha1 -H headerfile.json
 
 
-Additional headers for bag-info.txt
 
-    Pass additional headers as a json file, noo nesting supported. 
-    
-    Example: 
+Pass additional headers as a json file, no nesting supported. Example: 
+
     {
         "Source-Organization": "FOO University"
         "Contact-Email":"steffen@fritz.wtf"
