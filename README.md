@@ -9,7 +9,8 @@ IETF Draft: [https://tools.ietf.org/html/draft-kunze-bagit-17](https://tools.iet
 [![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=master)](https://travis-ci.org/steffenfritz/bagit)
 
 
-Version: 0.1.0
+Version: 0.2.0
+
 
 # Usage examples
 
@@ -24,6 +25,17 @@ Create a bag with all possible commandline options
     gobagit -create testinputdir -output outbagdir -tar -hash sha1 -H headerfile.json
 
 
+Additional headers for bag-info.txt
+
+    Pass additional headers as a json file, noo nesting supported. 
+    
+    Example: 
+    {
+        "Source-Organization": "FOO University"
+        "Contact-Email":"steffen@fritz.wtf"
+    }
+
+
 Commandline options:
 
     -H PATH_TO_FILE
@@ -31,7 +43,7 @@ Commandline options:
     -create PATH_TO_DIR
         Create bag. Expects path to source directory
     -hash ALGORITHM
-        Hash algorithm used for manifest file when creating a bag [sha1, sha256, md5] (default "sha256")
+        Hash algorithm used for manifest file when creating a bag [sha1, sha256, sha512, md5] (default "sha512")
     -output PATH_TO_DIR
         Output directory for bag. Used with create flag (default "bag_2019-06-11T225839")
     -tar
