@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"crypto/sha1"
 	"crypto/sha256"
+	"crypto/sha512"
 	"hash"
 	"io"
 	"log"
@@ -43,6 +44,16 @@ func hashit(inFile string, hashalg string) []byte {
 		checksum := hasher.Sum(nil)
 
 		return checksum
+
+	} else if hashalg == "sha512" {
+		hasher = sha512.New()
+		_, err = io.Copy(hasher, fd)
+		e(err)
+
+		checksum := hasher.Sum(nil)
+
+		return checksum
+
 	} else {
 		log.Println("Hash not implemented")
 		os.Exit(1)

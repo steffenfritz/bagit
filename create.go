@@ -85,6 +85,10 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 		}
 	}
 
+	// ToDo: Write optional fetch.txt file
+
+	// ToDo: write optional tagmanifest files
+
 	return err
 }
 

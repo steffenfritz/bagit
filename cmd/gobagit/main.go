@@ -9,7 +9,7 @@ import (
 	"github.com/steffenfritz/bagit"
 )
 
-const version = "0.1.0-DEV"
+const version = "0.2.0"
 
 var starttime = time.Now().Format("2006-01-02T150405")
 
@@ -20,7 +20,7 @@ func main() {
 	createSrc := flag.String("create", "", "Create bag. Expects path to source directory")
 	outputDir := flag.String("output", "bag_"+starttime, "Output directory for bag. Used with create flag")
 	tarit := flag.Bool("tar", false, "Create a tar archive when creating a bag")
-	hashalg := flag.String("hash", "sha256", "Hash algorithm used for manifest file when creating a bag [sha1, sha256, md5]")
+	hashalg := flag.String("hash", "sha512", "Hash algorithm used for manifest file when creating a bag [sha1, sha256, sha512, md5]")
 	verbose := flag.Bool("v", false, "Verbose output")
 	addHeader := flag.String("H", "", "Additional headers for bag-info.txt. Expects path to json file")
 

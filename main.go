@@ -7,7 +7,7 @@ import (
 
 const (
 	// BagitVer is the version of the bagit spec this library coresponds to
-	BagitVer = "0.97"
+	BagitVer = "1.0"
 	// TagFileCharEnc is the encoding of the tag files
 	TagFileCharEnc = "UTF-8"
 )
