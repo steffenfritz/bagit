@@ -90,8 +90,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 			fm.Seek(0, 0)
 			var hashcorrect bool
 			for scanner.Scan() {
-				// ToDo: There can be more than one whitespace between hash and path
-				if hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1] == scanner.Text() {
+				// normalizing strings here for comparison. We need a more elegant way
+				//println(strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1]), ""))
+				if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
 					hashcorrect = true
 				}
 
