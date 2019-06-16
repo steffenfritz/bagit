@@ -6,7 +6,7 @@ Wikipedia: [https://en.wikipedia.org/wiki/BagIt](https://en.wikipedia.org/wiki/B
 IETF Draft: [https://tools.ietf.org/html/draft-kunze-bagit-17](https://tools.ietf.org/html/draft-kunze-bagit-17)
 
 
-[![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=master)](https://travis-ci.org/steffenfritz/bagit)
+[![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=dev)](https://travis-ci.org/steffenfritz/bagit)
 
 
 Version: 0.2.0
