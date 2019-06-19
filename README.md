@@ -3,14 +3,13 @@ bagit is a library and command line tool to work with the BagIt format
 
 Wikipedia: [https://en.wikipedia.org/wiki/BagIt](https://en.wikipedia.org/wiki/BagIt) 
 
-IETF Draft: [https://tools.ietf.org/html/draft-kunze-bagit-17](https://tools.ietf.org/html/draft-kunze-bagit-17)
+IETF: [https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)
 
 
 [![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=dev)](https://travis-ci.org/steffenfritz/bagit)
 
 
 Version: 0.2.0
-
 
 # Usage examples
 
@@ -29,7 +28,7 @@ Create a bag with all possible commandline options
 Pass additional headers as a json file, no nesting supported. Example: 
 
     {
-        "Source-Organization": "FOO University"
+        "Source-Organization": "FOO University",
         "Contact-Email":"steffen@fritz.wtf"
     }
 
@@ -68,6 +67,6 @@ Download a pre-built binary from the releases page.
 
 # Limitations
 
-1. Only one manifest file is supported in version 0.1.0
-2. No additional tag directories are supported in version 0.1.0
+1. Only one payload manifest file is supported in version 0.2.0
+2. No additional tag directories are supported in version 0.2.0
 3. Issues page [https://github.com/steffenfritz/bagit/issues](https://github.com/steffenfritz/bagit/issues)
