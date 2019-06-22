@@ -90,8 +90,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 			fm.Seek(0, 0)
 			var hashcorrect bool
 			for scanner.Scan() {
-				// normalizing strings here for comparison. We need a more elegant way
-				//println(strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1]), ""))
+				// normalizing strings here for comparison. We need a more elegant and faster way
 				if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
 					hashcorrect = true
 				}
@@ -128,4 +127,23 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 
 	return err
 
+}
+
+// validateFetchFile validates fetch.txt files for correct syntax
+func validateFetchFile(inFetch string) bool {
+	var statFetchFile bool
+
+	ff, err := os.Open(inFetch)
+	e(err)
+	scanner := bufio.NewScanner(ff)
+	for scanner.Scan() {
+		println(strings.Fields(scanner.Text()))
+	}
+	// parse structure
+	// -- string.fields
+	// -- first field: check if uri format
+	// -- second field: check if dash or number
+	// -- third field: check if not empty
+	//
+	return statFetchFile
 }

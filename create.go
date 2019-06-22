@@ -12,7 +12,7 @@ import (
 )
 
 // Create creates a new bagit archive
-func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader string) error {
+func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader string, verbose bool, fetchFile string) error {
 
 	var err error
 
@@ -25,6 +25,15 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 		log.Println("WARNING: md5 has known collisions. You should not use md5.")
 		log.Println("WARNING: Press Ctrl + C to cancel or wait 5 seconds to continue...")
 		time.Sleep(5 * time.Second)
+	}
+
+	// validate fetch.txt file and exit if not valid
+	if len(fetchFile) != 0 {
+		fetchStatus := validateFetchFile(fetchFile)
+		if !fetchStatus {
+			log.Println("fetch.txt file not valid. Exiting creation process.")
+			return err
+		}
 	}
 
 	// create bagit directory
@@ -55,6 +64,12 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 	e(err)
 	defer fi.Close()
 
+	// fetching remote resources, calculating hashsums and adding them to manifest file
+	fetchManifest := make(map[string]string)
+	if len(fetchFile) != 0 {
+		fetchCreate(fetchFile, &fetchManifest)
+	}
+
 	// copy source to data dir in new bag, calculate oxum and count bytes of payload
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
@@ -84,8 +99,6 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 			_, err = fi.WriteString(k + ": " + v.(string) + "\n")
 		}
 	}
-
-	// ToDo: Write optional fetch.txt file
 
 	// ToDo: write optional tagmanifest files
 

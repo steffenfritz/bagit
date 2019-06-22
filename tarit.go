@@ -4,7 +4,6 @@ import (
 	"github.com/mholt/archiver"
 )
 
-//func tarbag(src string, writers ...io.Writer) error {
 func tarbag(src string, outarc string) error {
 
 	err := archiver.Archive([]string{src}, outarc)
