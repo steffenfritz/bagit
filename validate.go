@@ -129,8 +129,8 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 
 }
 
-// validateFetchFile validates fetch.txt files for correct syntax
-func validateFetchFile(inFetch string) bool {
+// ValidateFetchFile validates fetch.txt files for correct syntax
+func ValidateFetchFile(inFetch string) bool {
 	var statFetchFile bool
 
 	ff, err := os.Open(inFetch)

@@ -12,45 +12,31 @@ import (
 )
 
 // Create creates a new bagit archive
-func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader string, verbose bool, fetchFile string, maniFetch string) error {
+func (b *Bagit) Create(verbose bool) error {
 
 	var err error
 
 	var mapheader map[string]interface{}
-	if len(addHeader) != 0 {
-		mapheader = getaddHeader(addHeader)
+	if len(*b.AddHeader) != 0 {
+		mapheader = getaddHeader(*b.AddHeader)
 	}
 
-	if hashalg == "md5" {
+	if *b.HashAlg == "md5" {
 		log.Println("WARNING: md5 has known collisions. You should not use md5.")
 		log.Println("WARNING: Press Ctrl + C to cancel or wait 5 seconds to continue...")
 		time.Sleep(5 * time.Second)
 	}
 
-	// validate fetch.txt file and exit if not valid
-	if len(fetchFile) != 0 {
-		fetchStatus := validateFetchFile(fetchFile)
-		if !fetchStatus {
-			log.Println("fetch.txt file not valid. Exiting creation process.")
-			return err
-		}
-
-		if len(maniFetch) != 0 {
-			log.Println("The usage of a fetch.txt expects switch 'manifetch'. Quitting.")
-			return err
-		}
-	}
-
 	// create bagit directory
-	err = os.Mkdir(outDir, 0700)
+	err = os.Mkdir(*b.OutDir, 0700)
 	e(err)
 
 	// create payload dir
-	err = os.Mkdir(outDir+"/data", 0700)
+	err = os.Mkdir(*b.OutDir+"/data", 0700)
 	e(err)
 
 	// create bagit.txt tag file
-	fd, err := os.Create(outDir + "/bagit.txt")
+	fd, err := os.Create(*b.OutDir + "/bagit.txt")
 	e(err)
 	defer fd.Close()
 
@@ -60,33 +46,31 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 	e(err)
 
 	// create manifest-ALG.txt file
-	fm, err := os.Create(outDir + "/manifest-" + hashalg + ".txt")
+	fm, err := os.Create(*b.OutDir + "/manifest-" + *b.HashAlg + ".txt")
 	e(err)
 	defer fm.Close()
 
 	// create bag-info.txt file
-	fi, err := os.Create(outDir + "/bag-info.txt")
+	fi, err := os.Create(*b.OutDir + "/bag-info.txt")
 	e(err)
 	defer fi.Close()
 
-	// fetching remote resources, calculating hashsums and adding them to manifest file
-	fetchManifest := make(map[string]string)
-	if len(fetchFile) != 0 {
-		fetchCreate(fetchFile, &fetchManifest)
+	// Add provided fetch manifest for remote resources to manifest file
+	if len(*b.FetchFile) != 0 {
 	}
 
 	// copy source to data dir in new bag, calculate oxum and count bytes of payload
-	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(*b.SrcDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			b.Oxum.Filecount++
 			fsize, err := os.Stat(path)
 			e(err)
 			b.Oxum.Bytes += fsize.Size()
-			_, err = fm.WriteString(hex.EncodeToString(hashit(path, hashalg)) + " " + path + "\n")
-			copy(path, outDir+"/data/"+path)
+			_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " " + path + "\n")
+			copy(path, *b.OutDir+"/data/"+path)
 
 		} else {
-			os.MkdirAll(outDir+"/data/"+path, 0700)
+			os.MkdirAll(*b.OutDir+"/data/"+path, 0700)
 		}
 		return nil
 	})
