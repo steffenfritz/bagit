@@ -23,7 +23,8 @@ func main() {
 	hashalg := flag.String("hash", "sha512", "Hash algorithm used for manifest file when creating a bag [sha1, sha256, sha512, md5]")
 	verbose := flag.Bool("v", false, "Verbose output")
 	addHeader := flag.String("header", "", "Additional headers for bag-info.txt. Expects path to json file")
-	fetchFile := flag.String("fetch", "", "Adds optional fetch file to bag. Expects path to fetch.txt file")
+	fetchFile := flag.String("fetch", "", "Adds optional fetch file to bag. Expects path to fetch.txt file and switch manifetch")
+	fetchManifest := flag.String("manifetch", "", "Path to manifest file for optional fetch.txt file")
 
 	flag.Parse()
 
@@ -54,7 +55,7 @@ func main() {
 		}
 
 		b := bagit.New()
-		b.Create(*createSrc, *outputDir, *hashalg, *addHeader, *verbose, *fetchFile)
+		b.Create(*createSrc, *outputDir, *hashalg, *addHeader, *verbose, *fetchFile, *fetchManifest)
 
 		if *tarit {
 			b.Tarit(*outputDir, *outputDir+".tar.gz")

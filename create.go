@@ -12,7 +12,7 @@ import (
 )
 
 // Create creates a new bagit archive
-func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader string, verbose bool, fetchFile string) error {
+func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader string, verbose bool, fetchFile string, maniFetch string) error {
 
 	var err error
 
@@ -32,6 +32,11 @@ func (b *Bagit) Create(srcDir string, outDir string, hashalg string, addHeader s
 		fetchStatus := validateFetchFile(fetchFile)
 		if !fetchStatus {
 			log.Println("fetch.txt file not valid. Exiting creation process.")
+			return err
+		}
+
+		if len(maniFetch) != 0 {
+			log.Println("The usage of a fetch.txt expects switch 'manifetch'. Quitting.")
 			return err
 		}
 	}
