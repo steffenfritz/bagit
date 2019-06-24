@@ -63,7 +63,7 @@ func main() {
 			}
 
 			if len(*b.FetchManifest) != 0 {
-				log.Println("The usage of a fetch.txt expects a manifest file. Quitting.")
+				log.Println("The usage of a fetch.txt expects a related manifest file. Quitting.")
 				return
 			}
 		}
