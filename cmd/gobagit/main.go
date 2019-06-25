@@ -51,14 +51,20 @@ func main() {
 
 		_, err = os.Stat(*b.OutDir)
 		if err == nil {
-			log.Println("Output directory already exists. Refusing to overwrite.")
+			log.Println("Output directory already exists. Refusing to overwrite. Quitting.")
 			return
 		}
 		// validate fetch.txt file and exit if not valid
 		if len(*b.FetchFile) != 0 {
+			_, err := os.Stat(*b.FetchFile)
+			if err != nil {
+				log.Println("Could not read fetch.txt file. Quitting.")
+				return
+			}
+
 			fetchStatus := bagit.ValidateFetchFile(*b.FetchFile)
 			if !fetchStatus {
-				log.Println("fetch.txt file not valid. Exiting creation process.")
+				log.Println("fetch.txt file not valid. Quitting.")
 				return
 			}
 

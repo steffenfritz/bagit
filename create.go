@@ -81,6 +81,7 @@ func (b *Bagit) Create(verbose bool) error {
 	})
 	e(err)
 
+	// import fetch.txt file and concat provided manifest file to created manifest file
 	if len(*b.FetchFile) != 0 {
 		// check if file exists
 		_, err = os.Stat(*b.FetchFile)
@@ -98,10 +99,16 @@ func (b *Bagit) Create(verbose bool) error {
 		e(err)
 
 		if verbose {
-			log.Println("Copied cetch.txt file to file")
+			log.Println("Copied fetch.txt file to bag")
 		}
 
-		// concatenate fetch manifest to manifest
+		fmn, err := os.Open(*b.FetchManifest)
+		e(err)
+		defer fmn.Close()
+
+		_, err = io.Copy(fm, fmn)
+		e(err)
+
 		// iff all entries in fetch.txt have a length, add to oxum else warning
 		//
 	}

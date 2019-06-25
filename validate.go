@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/hex"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -131,19 +132,28 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 
 // ValidateFetchFile validates fetch.txt files for correct syntax
 func ValidateFetchFile(inFetch string) bool {
-	var statFetchFile bool
+	statFetchFile := true
 
 	ff, err := os.Open(inFetch)
 	e(err)
 	scanner := bufio.NewScanner(ff)
 	for scanner.Scan() {
-		println(strings.Fields(scanner.Text()))
+		fetchuri := strings.Fields(scanner.Text())[0]
+		fetchlen := strings.Fields(scanner.Text())[1]
+		println(strings.Fields(scanner.Text())[2])
+
+		// -- first field: check if uri format
+		_, err := url.ParseRequestURI(fetchuri)
+		if err != nil {
+			log.Println("Fetch file contains at least one invalid URI. Quitting.")
+			statFetchFile = false
+			return statFetchFile
+		}
+		// -- second field: check if dash or number
+		if fetchlen == "-" {
+		}
+		// -- third field: check if not empty
+		//
 	}
-	// parse structure
-	// -- string.fields
-	// -- first field: check if uri format
-	// -- second field: check if dash or number
-	// -- third field: check if not empty
-	//
 	return statFetchFile
 }
