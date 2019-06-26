@@ -74,7 +74,7 @@ Commandline options:
 ## Binary
 
 
-Download a pre-built binary from the releases page.
+NO DEV BINARIES: Download a pre-built binary from the releases page.
 
 
 # Limitations
