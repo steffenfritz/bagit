@@ -71,7 +71,7 @@ func (b *Bagit) Create(verbose bool) error {
 			fsize, err := os.Stat(path)
 			e(err)
 			b.Oxum.Bytes += fsize.Size()
-			_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " " + path + "\n")
+			_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " data/" + path + "\n")
 			copy(path, *b.OutDir+"/data/"+path)
 
 		} else {

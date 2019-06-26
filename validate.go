@@ -92,7 +92,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 			var hashcorrect bool
 			for scanner.Scan() {
 				// normalizing strings here for comparison. We need a more elegant and faster way
-				if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" "+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
+				if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
 					hashcorrect = true
 				}
 
