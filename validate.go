@@ -131,8 +131,12 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 }
 
 // ValidateFetchFile validates fetch.txt files for correct syntax
-func ValidateFetchFile(inFetch string) bool {
+// and returns sum of length and file count
+func ValidateFetchFile(inFetch string) (bool, bool, int, int) {
 	statFetchFile := true
+	oxumlencomplete := true
+	oxumbytes := 0
+	oxumfiles := 0
 
 	ff, err := os.Open(inFetch)
 	e(err)
@@ -140,20 +144,34 @@ func ValidateFetchFile(inFetch string) bool {
 	for scanner.Scan() {
 		fetchuri := strings.Fields(scanner.Text())[0]
 		fetchlen := strings.Fields(scanner.Text())[1]
-		println(strings.Fields(scanner.Text())[2])
+		fetchpath := strings.Fields(scanner.Text())[2]
 
 		// -- first field: check if uri format
 		_, err := url.ParseRequestURI(fetchuri)
 		if err != nil {
-			log.Println("Fetch file contains at least one invalid URI. Quitting.")
+			log.Println("fetch.txt: Fetch file contains at least one invalid URI. Quitting.")
 			statFetchFile = false
-			return statFetchFile
+			return statFetchFile, false, 0, 0
 		}
 		// -- second field: check if dash or number
-		if fetchlen == "-" {
+		if fetchlen != "-" {
+			fileoxum, err := strconv.Atoi(fetchlen)
+			if err != nil {
+				log.Println("fetch.txt: Length not a dash nor a number. Quitting.")
+				statFetchFile = false
+				return statFetchFile, false, 0, 0
+			}
+			oxumbytes += fileoxum
+		} else {
+			oxumlencomplete = false
 		}
-		// -- third field: check if not empty
-		//
+		// -- thierd field: check if not empty
+		if len(fetchpath) == 0 {
+			log.Println("fetch.txt: Local path empty. Quitting.")
+			statFetchFile = false
+			return statFetchFile, false, 0, 0
+		}
+		oxumfiles++
 	}
-	return statFetchFile
+	return statFetchFile, oxumlencomplete, oxumbytes, oxumfiles
 }
