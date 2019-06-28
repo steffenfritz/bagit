@@ -13,6 +13,7 @@ func TestValidateFetchFile(t *testing.T) {
 		{"testdata/fetch.txt", true, true, 2783, 2},
 		{"testdata/fetch_dash.txt", true, false, 2783, 3},
 		{"testdata/fetch_fail.txt", false, false, 0, 0},
+		{"testdata/fetch_nan.txt", false, false, 0, 0},
 	}
 
 	for _, entry := range table {
