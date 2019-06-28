@@ -165,7 +165,7 @@ func ValidateFetchFile(inFetch string) (bool, bool, int, int) {
 		} else {
 			oxumlencomplete = false
 		}
-		// -- thierd field: check if not empty
+		// -- third field: check if not empty
 		if len(fetchpath) == 0 {
 			log.Println("fetch.txt: Local path empty. Quitting.")
 			statFetchFile = false

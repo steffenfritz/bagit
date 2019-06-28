@@ -1,0 +1,3 @@
+ftp://test.de/header.json 55 testinput/header.json
+file://test.de/example.png 2728 testinput/main.go
+https://test.de/example.png - testinput/example.png
