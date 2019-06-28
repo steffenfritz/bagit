@@ -32,3 +32,26 @@ func TestValidateFetchFile(t *testing.T) {
 		}
 	}
 }
+
+func TestValidate(t *testing.T) {
+	b := New()
+	table := []struct {
+		inBag     string
+		verbose   bool
+		bagValid  bool
+		someError error
+	}{
+		{"testdata/LoC_Bag_01", false, true, nil},
+		{"testdata/LoC_Bag_02", false, false, nil},
+	}
+
+	for _, entry := range table {
+		bagValid, someError := b.Validate(entry.inBag, entry.verbose)
+		if entry.bagValid != bagValid {
+			t.Errorf(entry.inBag+" = %d", bagValid)
+		}
+		if entry.someError != someError {
+			t.Error(someError)
+		}
+	}
+}
