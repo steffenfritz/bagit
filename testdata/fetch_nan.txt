@@ -1,0 +1,4 @@
+ftp://test.de/example.jpg 55 testinput/header.json
+file://test.de/example.png 2728 testinput/main.go
+https://sub.test.de/example.png 8 testinput/main.go
+https://sub.test.de/example.png a testinput/main.go
