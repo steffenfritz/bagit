@@ -12,7 +12,7 @@ import (
 )
 
 // Validate validates a bag for completeness and correctness
-func (b *Bagit) Validate(srcDir string, verbose bool) error {
+func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	var err error
 	var hashalg string
 	var hashset bool
@@ -39,8 +39,8 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 
 	if !hashset {
 		log.Println("No manifest file found")
-		log.Println("Bag not valid")
-		return err
+		bagvalid = false
+		return bagvalid, err
 	}
 
 	if verbose {
@@ -54,6 +54,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 	var oxumread string
 	_, err = os.Stat(srcDir + "/bag-info.txt")
 	if err == nil {
+		log.Println("  Found bag-info.txt")
 		fd, err := os.Open(srcDir + "/bag-info.txt")
 		e(err)
 		defer fd.Close()
@@ -89,6 +90,11 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 			comppath := strings.SplitN(path, "/data/", 2)
 			scanner := bufio.NewScanner(fm)
 			fm.Seek(0, 0)
+
+			if verbose {
+				log.Println("  Hashing " + path)
+			}
+
 			var hashcorrect bool
 			for scanner.Scan() {
 				// normalizing strings here for comparison. We need a more elegant and faster way
@@ -120,13 +126,8 @@ func (b *Bagit) Validate(srcDir string, verbose bool) error {
 			log.Println("Oxum calculated: \t" + oxumcalculated)
 		}
 	}
-	if bagvalid == true {
-		log.Println("Bag is valid.")
-	} else {
-		log.Println("Bag is not valid.")
-	}
 
-	return err
+	return bagvalid, err
 
 }
 

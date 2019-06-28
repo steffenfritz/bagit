@@ -41,7 +41,15 @@ func main() {
 		if err == nil {
 			log.Println("Found a fetch.txt file in bag. Please add files before validating.")
 		}
-		b.Validate(*validate, *verbose)
+		bagvalid, err := b.Validate(*validate, *verbose)
+		if err != nil {
+			log.Println(err)
+		}
+		if !bagvalid {
+			log.Println("Bag not valid.")
+		} else {
+			log.Println("Bag is valid.")
+		}
 
 		return
 	}
