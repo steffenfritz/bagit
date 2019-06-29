@@ -3,4 +3,6 @@ coverage:
   round: nearest
   range: "40...70"
   ignore:
+      "tarit.go"
+      "copy.go"
 
