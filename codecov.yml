@@ -5,4 +5,4 @@ coverage:
   ignore:
     - "tarit.go"
     - "copy.go"
-
+    - "main.go"
