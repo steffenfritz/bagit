@@ -6,3 +6,4 @@ coverage:
     - "tarit.go"
     - "copy.go"
     - "main.go"
+    - "err.go"
