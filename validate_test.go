@@ -5,19 +5,20 @@ import "testing"
 func TestValidateFetchFile(t *testing.T) {
 	table := []struct {
 		inFile       string
+		verbose      bool
 		fetchValid   bool
 		oxumComplete bool
 		oxumBytes    int
 		oxumFiles    int
 	}{
-		{"testdata/fetch.txt", true, true, 2783, 2},
-		{"testdata/fetch_dash.txt", true, false, 2783, 3},
-		{"testdata/fetch_fail.txt", false, false, 0, 0},
-		{"testdata/fetch_nan.txt", false, false, 0, 0},
+		{"testdata/fetch.txt", false, true, true, 2783, 2},
+		{"testdata/fetch_dash.txt", false, true, false, 2783, 3},
+		{"testdata/fetch_fail.txt", false, false, false, 0, 0},
+		{"testdata/fetch_nan.txt", false, false, false, 0, 0},
 	}
 
 	for _, entry := range table {
-		fetchValid, oxumComplete, oxumBytes, oxumFiles := ValidateFetchFile(entry.inFile)
+		fetchValid, oxumComplete, oxumBytes, oxumFiles := ValidateFetchFile(entry.inFile, entry.verbose)
 		if entry.fetchValid != fetchValid {
 			t.Errorf(entry.inFile+" = %d", fetchValid)
 		}

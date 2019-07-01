@@ -54,7 +54,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	var oxumread string
 	_, err = os.Stat(srcDir + "/bag-info.txt")
 	if err == nil {
-		log.Println("  Found bag-info.txt")
+		if verbose {
+			log.Println("  Found bag-info.txt")
+		}
 		fd, err := os.Open(srcDir + "/bag-info.txt")
 		e(err)
 		defer fd.Close()
@@ -104,7 +106,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 			}
 			if !hashcorrect {
-				log.Println("File " + path + " not in manifest file or wrong hashsum!")
+				if verbose {
+					log.Println("File " + path + " not in manifest file or wrong hashsum!")
+				}
 				bagvalid = false
 			}
 
@@ -117,7 +121,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 		oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(int(b.Oxum.Filecount))
 
 		if oxumcalculated != oxumread {
-			log.Println("Oxum not valid")
+			if verbose {
+				log.Println("Oxum not valid")
+			}
 			bagvalid = false
 		}
 
@@ -133,7 +139,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 // ValidateFetchFile validates fetch.txt files for correct syntax
 // and returns sum of length and file count
-func ValidateFetchFile(inFetch string) (bool, bool, int, int) {
+func ValidateFetchFile(inFetch string, verbose bool) (bool, bool, int, int) {
 	statFetchFile := true
 	oxumlencomplete := true
 	oxumbytes := 0
@@ -150,7 +156,9 @@ func ValidateFetchFile(inFetch string) (bool, bool, int, int) {
 		// -- first field: check if uri format
 		_, err := url.ParseRequestURI(fetchuri)
 		if err != nil {
-			log.Println("fetch.txt: Fetch file contains at least one invalid URI. Quitting.")
+			if verbose {
+				log.Println("fetch.txt: Fetch file contains at least one invalid URI. Quitting.")
+			}
 			statFetchFile = false
 			return statFetchFile, false, 0, 0
 		}
@@ -158,7 +166,9 @@ func ValidateFetchFile(inFetch string) (bool, bool, int, int) {
 		if fetchlen != "-" {
 			fileoxum, err := strconv.Atoi(fetchlen)
 			if err != nil {
-				log.Println("fetch.txt: Length not a dash nor a number. Quitting.")
+				if verbose {
+					log.Println("fetch.txt: Length not a dash nor a number. Quitting.")
+				}
 				statFetchFile = false
 				return statFetchFile, false, 0, 0
 			}
@@ -168,7 +178,9 @@ func ValidateFetchFile(inFetch string) (bool, bool, int, int) {
 		}
 		// -- third field: check if not empty
 		if len(fetchpath) == 0 {
-			log.Println("fetch.txt: Local path empty. Quitting.")
+			if verbose {
+				log.Println("fetch.txt: Local path empty. Quitting.")
+			}
 			statFetchFile = false
 			return statFetchFile, false, 0, 0
 		}

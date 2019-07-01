@@ -83,7 +83,7 @@ func main() {
 				return
 			}
 
-			fetchStatus, fetchoxumcompl, fetchoxumbytes, fetchoxumfiles = bagit.ValidateFetchFile(*b.FetchFile)
+			fetchStatus, fetchoxumcompl, fetchoxumbytes, fetchoxumfiles = bagit.ValidateFetchFile(*b.FetchFile, *verbose)
 			if !fetchStatus {
 				log.Println("fetch.txt file not valid. Quitting.")
 				return
