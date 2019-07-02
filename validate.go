@@ -15,7 +15,7 @@ import (
 func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	var err error
 	var hashalg string
-	var hashset bool
+	var hashset bool // make uint for mult manifests
 	var manifestfile string
 	var checkoxum bool
 	bagvalid := true
@@ -27,23 +27,23 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasPrefix(info.Name(), "manifest-") {
-			if !hashset {
+			if !hashset { // remove this condition for mult manifests and replace by add to manifest map
 				hashalg = strings.Split(strings.Split(info.Name(), "-")[1], ".")[0]
 				manifestfile = path
-				hashset = true
+				hashset = true // add to manifest map
 			}
 		}
 		return err
 	})
 	e(err)
 
-	if !hashset {
+	if !hashset { // check if len(manifest map) == 0
 		log.Println("No manifest file found")
 		bagvalid = false
 		return bagvalid, err
 	}
 
-	if verbose {
+	if verbose { // list found algorithms
 		log.Println("Used hash algorithm: " + hashalg)
 	}
 
@@ -97,7 +97,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 				log.Println("  Hashing " + path)
 			}
 
-			var hashcorrect bool
+			var hashcorrect bool // put this in seperate loop and loop over map
 			for scanner.Scan() {
 				// normalizing strings here for comparison. We need a more elegant and faster way
 				if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
@@ -105,7 +105,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 				}
 
 			}
-			if !hashcorrect {
+			if !hashcorrect { // we need to store each validation and compare them
 				if verbose {
 					log.Println("File " + path + " not in manifest file or wrong hashsum!")
 				}
