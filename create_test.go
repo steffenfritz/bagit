@@ -76,4 +76,33 @@ func TestCreate(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
+
 }
+
+/*
+func BenchmarkCreate(b *testing.B) {
+	// command line flags
+	var verbose bool
+	srcDir := "testdata/testinput"
+	psrcDir := &srcDir
+	outDir := "testdata/bag_benchmark_golden"
+	poutDir := &outDir
+	addHeader := "testdata/header.json"
+	paddHeader := &addHeader
+	hashAlg := "sha512"
+	phashAlg := &hashAlg
+	fetchFile := ""
+	pfetchFile := &fetchFile
+	fetchManifest := ""
+	pfetchManifest := &fetchManifest
+
+	bag := New()
+	bag.SrcDir = psrcDir
+	bag.OutDir = poutDir
+	bag.AddHeader = paddHeader
+	bag.HashAlg = phashAlg
+	bag.FetchFile = pfetchFile
+	bag.FetchManifest = pfetchManifest
+	bag.Create(verbose)
+
+}*/
