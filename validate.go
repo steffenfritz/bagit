@@ -100,11 +100,18 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			var hashcorrect bool // put this in seperate loop and loop over map
 			for scanner.Scan() {
 				// normalizing strings here for comparison. We need a more elegant and faster way
-				if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
+				//if strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ") == strings.Join(strings.Fields(scanner.Text()), " ") {
+				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ")
+				read := strings.Join(strings.Fields(scanner.Text()), " ")
+				println(calc)
+				println(read)
+				if strings.EqualFold(calc, read) {
 					hashcorrect = true
+					return nil
 				}
-
 			}
+
+			//}
 			if !hashcorrect { // we need to store each validation and compare them
 				if verbose {
 					log.Println("File " + path + " not in manifest file or wrong hashsum!")
