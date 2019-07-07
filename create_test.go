@@ -35,6 +35,8 @@ func TestCreate(t *testing.T) {
 	pfetchFile := &fetchFile
 	fetchManifest := ""
 	pfetchManifest := &fetchManifest
+	tagmanifest := "sha512"
+	ptagmanifest := &tagmanifest
 
 	b := New()
 	b.SrcDir = psrcDir
@@ -43,6 +45,7 @@ func TestCreate(t *testing.T) {
 	b.HashAlg = phashAlg
 	b.FetchFile = pfetchFile
 	b.FetchManifest = pfetchManifest
+	b.TagManifest = ptagmanifest
 	b.Create(verbose)
 
 	_, err := os.Open("testdata/bag_golden/data/testdata/testinput/random.data")
@@ -65,6 +68,11 @@ func TestCreate(t *testing.T) {
 		t.Errorf("manifest-sha512.txt was not created")
 	}
 
+	_, err = os.Open("testdata/bag_golden/tagmanifest-sha512.txt")
+	if err != nil {
+		t.Errorf("tagmanifest-sha512.txt was not created")
+	}
+
 	// reset oxum for validation
 	b.Oxum.Bytes = 0
 	b.Oxum.Filecount = 0
@@ -78,31 +86,3 @@ func TestCreate(t *testing.T) {
 	}
 
 }
-
-/*
-func BenchmarkCreate(b *testing.B) {
-	// command line flags
-	var verbose bool
-	srcDir := "testdata/testinput"
-	psrcDir := &srcDir
-	outDir := "testdata/bag_benchmark_golden"
-	poutDir := &outDir
-	addHeader := "testdata/header.json"
-	paddHeader := &addHeader
-	hashAlg := "sha512"
-	phashAlg := &hashAlg
-	fetchFile := ""
-	pfetchFile := &fetchFile
-	fetchManifest := ""
-	pfetchManifest := &fetchManifest
-
-	bag := New()
-	bag.SrcDir = psrcDir
-	bag.OutDir = poutDir
-	bag.AddHeader = paddHeader
-	bag.HashAlg = phashAlg
-	bag.FetchFile = pfetchFile
-	bag.FetchManifest = pfetchManifest
-	bag.Create(verbose)
-
-}*/

@@ -26,6 +26,7 @@ func main() {
 	b.AddHeader = flag.String("header", "", "Additional headers for bag-info.txt. Expects path to json file")
 	b.FetchFile = flag.String("fetch", "", "Adds optional fetch file to bag. Expects path to fetch.txt file and switch manifetch")
 	b.FetchManifest = flag.String("manifetch", "", "Path to manifest file for optional fetch.txt file. Mandatory if fetch switch is used")
+	b.TagManifest = flag.String("tagmanifest", "", "Hash algorithm used for tag manifest file [sha1, sha256, sha512, md5]")
 
 	flag.Parse()
 

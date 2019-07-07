@@ -77,6 +77,18 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	e(err)
 	defer fm.Close()
 
+	// checking if all files are present that are listed in payload manifest
+	filescanner := bufio.NewScanner(fm)
+	for filescanner.Scan() {
+		_, err := os.Stat(srcDir + "/" + strings.Fields(filescanner.Text())[1])
+		if err != nil {
+			if verbose {
+				log.Println(strings.Fields(filescanner.Text())[1] + " is missing in the bag!")
+			}
+			bagvalid = false
+		}
+	}
+
 	// walk through bag, calculate hashes and look up result in manifest file and get info for oxum compare
 	if verbose {
 		log.Println("Checking hashsums of files in payload directory")
@@ -107,7 +119,6 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 				}
 			}
 
-			//}
 			if !hashcorrect { // we need to store each validation and compare them
 				if verbose {
 					log.Println("File " + path + " not in manifest file or wrong hashsum!")

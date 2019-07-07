@@ -24,6 +24,7 @@ type Bagit struct {
 	FetchFile     *string
 	FetchManifest *string
 	AddHeader     *string
+	TagManifest   *string
 }
 
 // Oxum defnies a type that holds the sum of all bytes and files in the data dir

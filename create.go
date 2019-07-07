@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -137,7 +138,23 @@ func (b *Bagit) Create(verbose bool) error {
 		}
 	}
 
-	// ToDo: write optional tagmanifest files
+	// create tag manifest
+	if len(*b.TagManifest) != 0 {
+		ftm, err := os.Create(*b.OutDir + "/tagmanifest-" + *b.TagManifest + ".txt")
+		e(err)
+		defer ftm.Close()
+
+		fileList, err := ioutil.ReadDir(*b.OutDir)
+		e(err)
+
+		for _, file := range fileList {
+			if !file.IsDir() {
+				if !strings.HasPrefix(file.Name(), "tagmanifest-") {
+					ftm.WriteString(hex.EncodeToString(hashit(*b.OutDir+"/"+file.Name(), *b.TagManifest)) + " " + file.Name() + "\n")
+				}
+			}
+		}
+	}
 
 	return err
 }
