@@ -3,6 +3,7 @@ package bagit
 import (
 	"bufio"
 	"encoding/hex"
+	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -18,6 +19,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	var hashset bool // make uint for mult manifests
 	var manifestfile string
 	var checkoxum bool
+	var tagmanifest string
 	bagvalid := true
 
 	// filepath expects backslash
@@ -32,6 +34,10 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 				manifestfile = path
 				hashset = true // add to manifest map
 			}
+		}
+
+		if strings.HasPrefix(info.Name(), "tagmanifest-") {
+			tagmanifest = strings.Split(strings.Split(info.Name(), "-")[1], ".")[0]
 		}
 		return err
 	})
@@ -70,6 +76,21 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 	} else {
 		log.Println("No bag-info.txt file found")
+
+	}
+
+	if len(tagmanifest) != 0 {
+		fileList, err := ioutil.ReadDir(srcDir)
+		e(err)
+
+		for _, file := range fileList {
+			if !file.IsDir() {
+				if !strings.HasPrefix(file.Name(), "tagmanifest-") {
+					println(hex.EncodeToString(hashit(srcDir+"/"+file.Name(), tagmanifest)))
+					// NEXT: Compare against tag manifest file
+				}
+			}
+		}
 
 	}
 
