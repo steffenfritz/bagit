@@ -1,5 +1,5 @@
-# bagit
-bagit is a library and command line tool to work with the BagIt format
+# gobagit
+gobagit is a command line tool to work with the BagIt format
 
 Wikipedia: [https://en.wikipedia.org/wiki/BagIt](https://en.wikipedia.org/wiki/BagIt) 
 
@@ -9,7 +9,7 @@ IETF: [https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)
 [![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=dev)](https://travis-ci.org/steffenfritz/bagit)
 [![codecov](https://codecov.io/gh/steffenfritz/bagit/branch/master/graph/badge.svg)](https://codecov.io/gh/steffenfritz/bagit)
 
-Version: 0.2.0
+Version: 0.4.0-DEV
 
 # Usage examples
 
@@ -27,7 +27,7 @@ Create a bag with some possible commandline options
 Create a bag with all possible commandline options
 
 
-    gobagit -create testinputdir -output outbagdir -tar -hash sha1 -header headerfile.json -fetch fetch.txt -manifetch fetchmanifest.txt
+    gobagit -create testinputdir -output outbagdir -tar -hash sha1 -header headerfile.json -fetch fetch.txt -manifetch fetchmanifest.txt -tagmanifest sha512
 
 Validate a bag
 
@@ -55,6 +55,8 @@ Commandline options:
         Path to manifest file for optional fetch.txt file. Mandatory if fetch switch is used
     -output PATH_TO_DIR
         Output directory for bag. Used with create flag (default "bag_2019-06-11T225839")
+    -tagmanifest ALGORITHM
+        Hash algorithm used for tagmanifest file when creating a bag [sha1, sha256, sha512, md5] (default "sha512")
     -tar
         Create a tar archive when creating a bag
     -v    Verbose output
@@ -79,7 +81,7 @@ Download a pre-built binary from the releases page.
 
 # Limitations
 
-1. Only one payload manifest file is supported in version 0.2.0
-2. No additional tag directories are supported in version 0.2.0
+1. Only one payload manifest file is supported in version 0.4.0
+2. No additional tag directories are supported in version 0.4.0
 3. Issues page [https://github.com/steffenfritz/bagit/issues](https://github.com/steffenfritz/bagit/issues)
 4. When creating a bag fetch does NOT validate if the provided hashes match the hash algorithm for the bag's manifest
