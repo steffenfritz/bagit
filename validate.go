@@ -3,7 +3,6 @@ package bagit
 import (
 	"bufio"
 	"encoding/hex"
-	"io/ioutil"
 	"log"
 	"net/url"
 	"os"
@@ -16,10 +15,10 @@ import (
 func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	var err error
 	var hashalg string
-	var hashset bool // make uint for mult manifests
+	var hashset bool
 	var manifestfile string
 	var checkoxum bool
-	var tagmanifest string
+	var tagmanifests []string
 	bagvalid := true
 
 	// filepath expects backslash
@@ -29,28 +28,29 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasPrefix(info.Name(), "manifest-") {
-			if !hashset { // remove this condition for mult manifests and replace by add to manifest map
+			if !hashset {
 				hashalg = strings.Split(strings.Split(info.Name(), "-")[1], ".")[0]
 				manifestfile = path
-				hashset = true // add to manifest map
+				hashset = true
 			}
 		}
 
+		// add tagmanifests to list tagmanifests if present
 		if strings.HasPrefix(info.Name(), "tagmanifest-") {
-			tagmanifest = strings.Split(strings.Split(info.Name(), "-")[1], ".")[0]
+			tagmanifests = append(tagmanifests, info.Name())
 		}
 		return err
 	})
 	e(err)
 
-	if !hashset { // check if len(manifest map) == 0
+	if !hashset {
 		log.Println("No manifest file found")
 		bagvalid = false
 		return bagvalid, err
 	}
 
-	if verbose { // list found algorithms
-		log.Println("Used hash algorithm: " + hashalg)
+	if verbose {
+		log.Println("Used hash algorithm for payload manifest: " + hashalg)
 	}
 
 	// check oxum
@@ -76,21 +76,6 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 	} else {
 		log.Println("No bag-info.txt file found")
-
-	}
-
-	if len(tagmanifest) != 0 {
-		fileList, err := ioutil.ReadDir(srcDir)
-		e(err)
-
-		for _, file := range fileList {
-			if !file.IsDir() {
-				if !strings.HasPrefix(file.Name(), "tagmanifest-") {
-					println(hex.EncodeToString(hashit(srcDir+"/"+file.Name(), tagmanifest)))
-					// NEXT: Compare against tag manifest file
-				}
-			}
-		}
 
 	}
 
@@ -130,7 +115,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 				log.Println("  Hashing " + path)
 			}
 
-			var hashcorrect bool // put this in seperate loop and loop over map
+			var hashcorrect bool
 			for scanner.Scan() {
 				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ")
 				read := strings.Join(strings.Fields(scanner.Text()), " ")
@@ -140,7 +125,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 				}
 			}
 
-			if !hashcorrect { // we need to store each validation and compare them
+			if !hashcorrect {
 				if verbose {
 					log.Println("File " + path + " not in manifest file or wrong hashsum!")
 				}
@@ -167,6 +152,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			log.Println("Oxum calculated: \t" + oxumcalculated)
 		}
 	}
+
+	// validate tag manifests
+	ValidateTagmanifests(&srcDir, &tagmanifests, verbose, &bagvalid)
 
 	return bagvalid, err
 
@@ -222,4 +210,41 @@ func ValidateFetchFile(inFetch string, verbose bool) (bool, bool, int, int) {
 		oxumfiles++
 	}
 	return statFetchFile, oxumlencomplete, oxumbytes, oxumfiles
+}
+
+// ValidateTagmanifests validates the hash sums of tag files
+func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, bagvalid *bool) {
+	if len(*tagmanifests) != 0 {
+		for _, tmentry := range *tagmanifests {
+			tmpfd, err := os.Open(*srcDir + "/" + tmentry)
+			e(err)
+			defer tmpfd.Close()
+			tmphashalg := strings.Split(strings.Split(tmentry, "-")[1], ".")[0]
+
+			if verbose {
+				log.Println("Used hash algorithm for tagmanifest: " + tmphashalg)
+			}
+
+			scanner := bufio.NewScanner(tmpfd)
+			for scanner.Scan() {
+				tmptagfile := strings.Split(scanner.Text(), " ")[1]
+				tmptagstat, err := os.Lstat(*srcDir + "/" + tmptagfile)
+				e(err)
+				if !tmptagstat.IsDir() {
+					if verbose {
+						log.Println("  Hashing " + *srcDir + tmptagfile)
+					}
+					calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(*srcDir+tmptagfile, tmphashalg))+" "+tmptagfile), " ")
+					read := strings.Join(strings.Fields(scanner.Text()), " ")
+					if !strings.EqualFold(calc, read) {
+						*bagvalid = false
+						if verbose {
+							log.Println("  File " + *srcDir + tmptagfile + " not in manifest file or wrong hashsum!")
+						}
+					}
+				}
+			}
+		}
+	}
+
 }
