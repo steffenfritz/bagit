@@ -7,12 +7,16 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strconv"
 	"strings"
 )
 
 // Validate validates a bag for completeness and correctness
 func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
+
+	runtime.GOMAXPROCS(2)
+
 	var err error
 	var hashalg string
 	var hashset bool
@@ -86,10 +90,11 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	// checking if all files are present that are listed in payload manifest
 	filescanner := bufio.NewScanner(fm)
 	for filescanner.Scan() {
-		_, err := os.Stat(srcDir + "/" + strings.Fields(filescanner.Text())[1])
+		tmpfile := strings.SplitN(filescanner.Text(), " ", 2)[1]
+		_, err := os.Stat(srcDir + "/" + tmpfile)
 		if err != nil {
 			if verbose {
-				log.Println(strings.Fields(filescanner.Text())[1] + " is missing in the bag!")
+				log.Println(tmpfile + " is missing in the bag!")
 			}
 			bagvalid = false
 		}
