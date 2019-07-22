@@ -7,15 +7,12 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
-	"runtime"
 	"strconv"
 	"strings"
 )
 
 // Validate validates a bag for completeness and correctness
 func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
-
-	runtime.GOMAXPROCS(2)
 
 	var err error
 	var hashalg string
