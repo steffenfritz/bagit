@@ -87,11 +87,11 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	// checking if all files are present that are listed in payload manifest
 	filescanner := bufio.NewScanner(fm)
 	for filescanner.Scan() {
-		tmpfile := strings.SplitN(filescanner.Text(), " ", 2)[1]
-		_, err := os.Stat(srcDir + string(os.PathSeparator) + tmpfile)
+		tmpfile := strings.TrimLeft(strings.SplitN(filescanner.Text(), " ", 2)[1], " ")
+		_, err := os.Stat(srcDir + tmpfile)
 		if err != nil {
 			if verbose {
-				log.Println(tmpfile + " is missing in the bag!")
+				log.Println(srcDir + tmpfile + " is missing in the bag!")
 			}
 			bagvalid = false
 		}
@@ -241,9 +241,7 @@ func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, 
 						log.Println("  Hashing " + *srcDir + tmptagfile)
 					}
 					calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(*srcDir+tmptagfile, tmphashalg))+" "+tmptagfile), " ")
-					println(calc)
 					read := strings.Join(strings.Fields(scanner.Text()), " ")
-					println(read)
 					if !strings.EqualFold(calc, read) {
 						*bagvalid = false
 						if verbose {
