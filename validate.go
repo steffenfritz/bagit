@@ -23,8 +23,8 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	bagvalid := true
 
 	// filepath expects backslash
-	if !strings.HasSuffix(srcDir, "/") {
-		srcDir = srcDir + "/"
+	if !strings.HasSuffix(srcDir, string(os.PathSeparator)) {
+		srcDir = srcDir + string(os.PathSeparator)
 	}
 
 	err = filepath.Walk(srcDir, func(path string, info os.FileInfo, err error) error {
@@ -59,12 +59,12 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 		log.Println("Looking for bag-info.txt file")
 	}
 	var oxumread string
-	_, err = os.Stat(srcDir + "/bag-info.txt")
+	_, err = os.Stat(srcDir + string(os.PathSeparator) + "bag-info.txt")
 	if err == nil {
 		if verbose {
 			log.Println("  Found bag-info.txt")
 		}
-		fd, err := os.Open(srcDir + "/bag-info.txt")
+		fd, err := os.Open(srcDir + string(os.PathSeparator) + "bag-info.txt")
 		e(err)
 		defer fd.Close()
 		scanner := bufio.NewScanner(fd)
@@ -88,7 +88,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	filescanner := bufio.NewScanner(fm)
 	for filescanner.Scan() {
 		tmpfile := strings.SplitN(filescanner.Text(), " ", 2)[1]
-		_, err := os.Stat(srcDir + "/" + tmpfile)
+		_, err := os.Stat(srcDir + string(os.PathSeparator) + tmpfile)
 		if err != nil {
 			if verbose {
 				log.Println(tmpfile + " is missing in the bag!")
@@ -102,14 +102,14 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 		log.Println("Checking hashsums of files in payload directory")
 	}
 
-	err = filepath.Walk(srcDir+"data/", func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(srcDir+"data"+string(os.PathSeparator), func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			b.Oxum.Filecount++
 			fsize, err := os.Stat(path)
 			e(err)
 			b.Oxum.Bytes += fsize.Size()
 
-			comppath := strings.SplitN(path, "/data/", 2)
+			comppath := strings.SplitN(path, string(os.PathSeparator)+"data"+string(os.PathSeparator), 2)
 			scanner := bufio.NewScanner(fm)
 			fm.Seek(0, 0)
 
@@ -119,7 +119,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 			var hashcorrect bool
 			for scanner.Scan() {
-				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data/"+comppath[1]), " ")
+				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+string(os.PathSeparator)+comppath[1]), " ")
 				read := strings.Join(strings.Fields(scanner.Text()), " ")
 				if strings.EqualFold(calc, read) {
 					hashcorrect = true
@@ -218,7 +218,7 @@ func ValidateFetchFile(inFetch string, verbose bool) (bool, bool, int, int) {
 func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, bagvalid *bool) {
 	if len(*tagmanifests) != 0 {
 		for _, tmentry := range *tagmanifests {
-			tmpfd, err := os.Open(*srcDir + "/" + tmentry)
+			tmpfd, err := os.Open(*srcDir + string(os.PathSeparator) + tmentry)
 			e(err)
 			defer tmpfd.Close()
 			tmphashalg := strings.Split(strings.Split(tmentry, "-")[1], ".")[0]
@@ -230,7 +230,7 @@ func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, 
 			scanner := bufio.NewScanner(tmpfd)
 			for scanner.Scan() {
 				tmptagfile := strings.Split(scanner.Text(), " ")[1]
-				tmptagstat, err := os.Lstat(*srcDir + "/" + tmptagfile)
+				tmptagstat, err := os.Lstat(*srcDir + string(os.PathSeparator) + tmptagfile)
 				e(err)
 				if !tmptagstat.IsDir() {
 					if verbose {
