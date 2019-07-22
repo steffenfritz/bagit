@@ -110,6 +110,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			b.Oxum.Bytes += fsize.Size()
 
 			comppath := strings.SplitN(path, string(os.PathSeparator)+"data"+string(os.PathSeparator), 2)
+			// normalizing path separators for comparison
+			normcompath := strings.Replace(comppath[1], string(os.PathSeparator), "/", -1)
+
 			scanner := bufio.NewScanner(fm)
 			fm.Seek(0, 0)
 
@@ -119,7 +122,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 			var hashcorrect bool
 			for scanner.Scan() {
-				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+string(os.PathSeparator)+comppath[1]), " ")
+				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+"/"+normcompath), " ")
 				read := strings.Join(strings.Fields(scanner.Text()), " ")
 				if strings.EqualFold(calc, read) {
 					hashcorrect = true
@@ -129,7 +132,7 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 
 			if !hashcorrect {
 				if verbose {
-					log.Println("File " + path + " not in manifest file or wrong hashsum!")
+					log.Println("File " + normcompath + " not in manifest file or wrong hashsum!")
 				}
 				bagvalid = false
 			}
@@ -232,12 +235,15 @@ func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, 
 				tmptagfile := strings.Split(scanner.Text(), " ")[1]
 				tmptagstat, err := os.Lstat(*srcDir + string(os.PathSeparator) + tmptagfile)
 				e(err)
+
 				if !tmptagstat.IsDir() {
 					if verbose {
 						log.Println("  Hashing " + *srcDir + tmptagfile)
 					}
 					calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(*srcDir+tmptagfile, tmphashalg))+" "+tmptagfile), " ")
+					println(calc)
 					read := strings.Join(strings.Fields(scanner.Text()), " ")
+					println(read)
 					if !strings.EqualFold(calc, read) {
 						*bagvalid = false
 						if verbose {

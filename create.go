@@ -72,7 +72,10 @@ func (b *Bagit) Create(verbose bool) error {
 			fsize, err := os.Stat(path)
 			e(err)
 			b.Oxum.Bytes += fsize.Size()
-			_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " data/" + path + "\n")
+			// normalizing path separators
+			normpath := strings.Replace(path, string(os.PathSeparator), "/", -1)
+			//_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " data/" + path + "\n")
+			_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " data/" + normpath + "\n")
 			copy(path, *b.OutDir+"/data/"+path)
 
 		} else {
