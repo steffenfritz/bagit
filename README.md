@@ -9,7 +9,7 @@ IETF: [https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)
 [![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=master)](https://travis-ci.org/steffenfritz/bagit)
 [![codecov](https://codecov.io/gh/steffenfritz/bagit/branch/master/graph/badge.svg)](https://codecov.io/gh/steffenfritz/bagit)
 
-Version: 0.4.0-DEV
+Version: 0.4.0
 
 # Usage examples
 

@@ -9,7 +9,7 @@ import (
 	"github.com/steffenfritz/bagit"
 )
 
-const version = "0.4.0-DEV"
+const version = "0.4.0"
 
 var starttime = time.Now().Format("2006-01-02T150405")
 
