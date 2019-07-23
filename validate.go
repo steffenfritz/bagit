@@ -121,10 +121,12 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			}
 
 			var hashcorrect bool
+			calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+"/"+normcompath), " ")
 			for scanner.Scan() {
-				calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+"/"+normcompath), " ")
+				// calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+"/"+normcompath), " ")
 				read := strings.Join(strings.Fields(scanner.Text()), " ")
 				if strings.EqualFold(calc, read) {
+					println(3)
 					hashcorrect = true
 					return nil
 				}
@@ -221,7 +223,8 @@ func ValidateFetchFile(inFetch string, verbose bool) (bool, bool, int, int) {
 func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, bagvalid *bool) {
 	if len(*tagmanifests) != 0 {
 		for _, tmentry := range *tagmanifests {
-			tmpfd, err := os.Open(*srcDir + string(os.PathSeparator) + tmentry)
+			//tmpfd, err := os.Open(*srcDir + string(os.PathSeparator) + tmentry)
+			tmpfd, err := os.Open(*srcDir + tmentry)
 			e(err)
 			defer tmpfd.Close()
 			tmphashalg := strings.Split(strings.Split(tmentry, "-")[1], ".")[0]
