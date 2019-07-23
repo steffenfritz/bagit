@@ -123,10 +123,8 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			var hashcorrect bool
 			calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+"/"+normcompath), " ")
 			for scanner.Scan() {
-				// calc := strings.Join(strings.Fields(hex.EncodeToString(hashit(path, hashalg))+" data"+"/"+normcompath), " ")
 				read := strings.Join(strings.Fields(scanner.Text()), " ")
 				if strings.EqualFold(calc, read) {
-					println(3)
 					hashcorrect = true
 					return nil
 				}
