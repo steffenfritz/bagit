@@ -42,7 +42,7 @@ func TestValidate(t *testing.T) {
 		bagValid  bool
 		someError error
 	}{
-		{"testdata/LoC_Bag_01", true, true, nil},
+		{"testdata/LoC_Bag_01", false, true, nil},
 		{"testdata/LoC_Bag_02", false, false, nil},
 	}
 

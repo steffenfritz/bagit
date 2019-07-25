@@ -113,8 +113,6 @@ func (b *Bagit) Create(verbose bool) error {
 		_, err = io.Copy(fm, fmn)
 		e(err)
 
-		// iff all entries in fetch.txt have a length, add to oxum else warning
-		//
 	}
 
 	if verbose {
