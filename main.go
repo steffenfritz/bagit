@@ -46,3 +46,10 @@ func (b *Bagit) Tarit(srcDir string, outFile string) error {
 	tarbag(srcDir, outFile)
 	return nil
 }
+
+// Zipit zips a directory
+func (b *Bagit) Zipit(srcDir string, outFile string) error {
+
+	zipbag(srcDir, outFile)
+	return nil
+}
