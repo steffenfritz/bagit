@@ -1,3 +1,6 @@
+Repo moved to Codeberg: https://codeberg.org/steffenfritz/bagit
+
+
 # gobagit
 gobagit is a command line tool to work with the BagIt format
 
