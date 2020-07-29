@@ -1,4 +1,4 @@
-Repo moved to Codeberg: https://codeberg.org/steffenfritz/bagit
+Repo moved to Codeberg: [https://codeberg.org/steffenfritz/bagit](https://codeberg.org/steffenfritz/bagit)
 
 
 # gobagit
