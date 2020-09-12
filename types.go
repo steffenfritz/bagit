@@ -2,7 +2,6 @@ package bagit
 
 import (
 	"crypto"
-	"time"
 )
 
 const (
@@ -31,18 +30,4 @@ type Bagit struct {
 type Oxum struct {
 	Bytes     int64
 	Filecount int
-}
-
-// New creates a new Bagit struct
-func New() *Bagit {
-	return &Bagit{
-		Timestamp: time.Now().Format("2006-01-02T15:04:05"),
-	}
-}
-
-// Tarit tars a directory
-func (b *Bagit) Tarit(srcDir string, outFile string) error {
-
-	tarbag(srcDir, outFile)
-	return nil
 }

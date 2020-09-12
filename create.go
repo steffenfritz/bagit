@@ -13,6 +13,13 @@ import (
 	"time"
 )
 
+// New creates a new Bagit struct
+func New() *Bagit {
+	return &Bagit{
+		Timestamp: time.Now().Format("2006-01-02T15:04:05"),
+	}
+}
+
 // Create creates a new bagit archive
 func (b *Bagit) Create(verbose bool) error {
 
