@@ -60,8 +60,7 @@ func TestValidate(t *testing.T) {
 func BenchmarkValidate(b *testing.B) {
 	bag := New()
 	inBag := "testdata/LoC_Bag_01"
-	verbose := false
 
-	bag.Validate(inBag, verbose)
+	bag.Validate(inBag, false)
 
 }
