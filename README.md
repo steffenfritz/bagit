@@ -84,7 +84,7 @@ Download a pre-built binary from the releases page.
 
 The test cases include validation tests of two bags, created with LoC's bagit.py (https://libraryofcongress.github.io/bagit-python/)
 
-One bag is valid, the others isn't. gobagit has to validate both cases to pass the testing.
+One bag is valid, the other isn't. gobagit has to validate both cases to pass the testing.
 
 Bags created with gobagit are validated using bagit.py. The created bags have to be valid to pass the testing.
 
