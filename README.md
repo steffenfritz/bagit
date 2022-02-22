@@ -6,12 +6,12 @@ Wikipedia: [https://en.wikipedia.org/wiki/BagIt](https://en.wikipedia.org/wiki/B
 IETF: [https://tools.ietf.org/html/rfc8493](https://tools.ietf.org/html/rfc8493)
 
 
-[![Build Status](https://travis-ci.org/steffenfritz/bagit.svg?branch=master)](https://travis-ci.org/steffenfritz/bagit)
+[![Build status](https://ci.appveyor.com/api/projects/status/vscholjbph8umbd3?svg=true)](https://ci.appveyor.com/project/steffenfritz/bagit)
 [![codecov](https://codecov.io/gh/steffenfritz/bagit/branch/master/graph/badge.svg)](https://codecov.io/gh/steffenfritz/bagit)
 [![Go Report Card](https://goreportcard.com/badge/github.com/steffenfritz/bagit)](https://goreportcard.com/report/github.com/steffenfritz/bagit)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=steffenfritz_bagit&metric=alert_status)](https://sonarcloud.io/dashboard?id=steffenfritz_bagit)
 
-Version: 0.4.0
+Version: 0.5.0
 
 # Usage examples
 

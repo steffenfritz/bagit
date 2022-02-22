@@ -38,7 +38,9 @@ func (b *Bagit) Create(verbose bool) error {
 
 	// create bagit directory
 	err = os.Mkdir(*b.OutDir, 0700)
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	if verbose {
 		log.Println("Created output dir:\t" + *b.OutDir)
@@ -46,17 +48,30 @@ func (b *Bagit) Create(verbose bool) error {
 
 	// create payload dir
 	err = os.Mkdir(*b.OutDir+"/data", 0700)
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	// create bagit.txt tag file
 	fd, err := os.Create(*b.OutDir + "/bagit.txt")
-	e(err)
-	defer fd.Close()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
+	defer func(fd *os.File) {
+		err := fd.Close()
+		if err != nil {
+			log.Printf("WARNING: %s", err.Error())
+		}
+	}(fd)
 
 	_, err = fd.WriteString("BagIt-Version: " + BagitVer + "\n")
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 	_, err = fd.WriteString("Tag-File-Character-Encoding: " + TagFileCharEnc)
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	if verbose {
 		log.Println("Created bagit.txt file")
@@ -64,61 +79,113 @@ func (b *Bagit) Create(verbose bool) error {
 
 	// create manifest-ALG.txt file
 	fm, err := os.Create(*b.OutDir + "/manifest-" + *b.HashAlg + ".txt")
-	e(err)
-	defer fm.Close()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
+	defer func(fm *os.File) {
+		err := fm.Close()
+		if err != nil {
+			log.Printf("WARNING: %s", err.Error())
+		}
+	}(fm)
 
 	// create bag-info.txt file
 	fi, err := os.Create(*b.OutDir + "/bag-info.txt")
-	e(err)
-	defer fi.Close()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
+	defer func(fi *os.File) {
+		err := fi.Close()
+		if err != nil {
+			log.Printf("WARNING: %s", err.Error())
+		}
+	}(fi)
 
 	// copy source to data dir in new bag, calculate oxum and count bytes of payload
 	err = filepath.Walk(*b.SrcDir, func(path string, info os.FileInfo, err error) error {
 		if !info.IsDir() {
 			b.Oxum.Filecount++
 			fsize, err := os.Stat(path)
-			e(err)
+			if err != nil {
+				log.Fatalf("ERROR: %s", err.Error())
+			}
 			b.Oxum.Bytes += fsize.Size()
 			// normalizing path separators
+			// ToDo: Issue https://github.com/steffenfritz/bagit/issues/11
 			normpath := strings.Replace(path, string(os.PathSeparator), "/", -1)
 			//_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " data/" + path + "\n")
 			_, err = fm.WriteString(hex.EncodeToString(hashit(path, *b.HashAlg)) + " data/" + normpath + "\n")
-			copy(path, *b.OutDir+"/data/"+path)
+			_, cperr := copy(path, *b.OutDir+"/data/"+path)
+			if cperr != nil {
+				log.Fatalf("ERROR: %s", err.Error())
+			}
 
 		} else {
-			os.MkdirAll(*b.OutDir+"/data/"+path, 0700)
+			err := os.MkdirAll(*b.OutDir+"/data/"+path, 0700)
+			if err != nil {
+				log.Fatalf("ERROR: %s", err)
+			}
 		}
 		return nil
 	})
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	// import fetch.txt file and concat provided manifest file to created manifest file
 	if len(*b.FetchFile) != 0 {
 		// check if file exists
 		_, err = os.Stat(*b.FetchFile)
-		e(err)
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
 		// copy fetch file to bag
 		src, err := os.Open(*b.FetchFile)
-		e(err)
-		defer src.Close()
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
+		defer func(src *os.File) {
+			err := src.Close()
+			if err != nil {
+				log.Printf("WARNING: %s", err.Error())
+			}
+		}(src)
 
 		dst, err := os.Create(*b.OutDir + "/fetch.txt")
-		e(err)
-		defer dst.Close()
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
+		defer func(dst *os.File) {
+			err := dst.Close()
+			if err != nil {
+				log.Printf("WARNING: %s", err.Error())
+			}
+		}(dst)
 
 		_, err = io.Copy(dst, src)
-		e(err)
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
 
 		if verbose {
 			log.Println("Copied fetch.txt file to bag")
 		}
 
 		fmn, err := os.Open(*b.FetchManifest)
-		e(err)
-		defer fmn.Close()
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
+		defer func(fmn *os.File) {
+			err := fmn.Close()
+			if err != nil {
+				log.Printf("WARNING: %s", err.Error())
+			}
+		}(fmn)
 
 		_, err = io.Copy(fm, fmn)
-		e(err)
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
 
 	}
 
@@ -149,16 +216,28 @@ func (b *Bagit) Create(verbose bool) error {
 	// create tag manifest
 	if len(*b.TagManifest) != 0 {
 		ftm, err := os.Create(*b.OutDir + "/tagmanifest-" + *b.TagManifest + ".txt")
-		e(err)
-		defer ftm.Close()
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
+		defer func(ftm *os.File) {
+			err := ftm.Close()
+			if err != nil {
+				log.Printf("WARNING: %s", err.Error())
+			}
+		}(ftm)
 
 		fileList, err := ioutil.ReadDir(*b.OutDir)
-		e(err)
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
 
 		for _, file := range fileList {
 			if !file.IsDir() {
 				if !strings.HasPrefix(file.Name(), "tagmanifest-") {
-					ftm.WriteString(hex.EncodeToString(hashit(*b.OutDir+"/"+file.Name(), *b.TagManifest)) + " " + file.Name() + "\n")
+					_, wrerr := ftm.WriteString(hex.EncodeToString(hashit(*b.OutDir+"/"+file.Name(), *b.TagManifest)) + " " + file.Name() + "\n")
+					if wrerr != nil {
+						return wrerr
+					}
 				}
 			}
 		}
@@ -170,13 +249,23 @@ func (b *Bagit) Create(verbose bool) error {
 // getaddHeader gets additional headers from a json file
 func getaddHeader(addHeader string) map[string]interface{} {
 	jsonFile, err := os.Open(addHeader)
-	e(err)
-	defer jsonFile.Close()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
+	defer func(jsonFile *os.File) {
+		err := jsonFile.Close()
+		if err != nil {
+			log.Printf("WARNING: %s", err.Error())
+		}
+	}(jsonFile)
 
 	byteValue, _ := ioutil.ReadAll(jsonFile)
 
 	var result map[string]interface{}
-	json.Unmarshal([]byte(byteValue), &result)
+	err = json.Unmarshal(byteValue, &result)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	return result
 }

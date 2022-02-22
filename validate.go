@@ -42,7 +42,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 		}
 		return err
 	})
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	if !hashset {
 		log.Println("No manifest file found")
@@ -65,8 +67,15 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			log.Println("  Found bag-info.txt")
 		}
 		fd, err := os.Open(srcDir + string(os.PathSeparator) + "bag-info.txt")
-		e(err)
-		defer fd.Close()
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
+		defer func(fd *os.File) {
+			err := fd.Close()
+			if err != nil {
+				log.Printf("WARNING: %s", err.Error())
+			}
+		}(fd)
 		scanner := bufio.NewScanner(fd)
 		for scanner.Scan() {
 			if strings.HasPrefix(scanner.Text(), "Payload-Oxum:") {
@@ -81,8 +90,15 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 	}
 
 	fm, err := os.Open(manifestfile)
-	e(err)
-	defer fm.Close()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
+	defer func(fm *os.File) {
+		err := fm.Close()
+		if err != nil {
+			log.Printf("WARNING: %s", err.Error())
+		}
+	}(fm)
 
 	// checking if all files are present that are listed in payload manifest
 	filescanner := bufio.NewScanner(fm)
@@ -106,7 +122,9 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 		if !info.IsDir() {
 			b.Oxum.Filecount++
 			fsize, err := os.Stat(path)
-			e(err)
+			if err != nil {
+				log.Fatalf("ERROR: %s", err.Error())
+			}
 			b.Oxum.Bytes += fsize.Size()
 
 			comppath := strings.SplitN(path, string(os.PathSeparator)+"data"+string(os.PathSeparator), 2)
@@ -114,7 +132,11 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 			normcompath := strings.Replace(comppath[1], string(os.PathSeparator), "/", -1)
 
 			scanner := bufio.NewScanner(fm)
-			fm.Seek(0, 0)
+			_, err = fm.Seek(0, 0)
+			if err != nil {
+				// ToDo: This should probably be a fatal one
+				log.Printf("WARNING: %s", err.Error())
+			}
 
 			if verbose {
 				log.Println("  Hashing " + path)
@@ -140,10 +162,12 @@ func (b *Bagit) Validate(srcDir string, verbose bool) (bool, error) {
 		}
 		return nil
 	})
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	if checkoxum {
-		oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(int(b.Oxum.Filecount))
+		oxumcalculated := strconv.Itoa(int(b.Oxum.Bytes)) + "." + strconv.Itoa(b.Oxum.Filecount)
 
 		if oxumcalculated != oxumread {
 			if verbose {
@@ -174,7 +198,9 @@ func ValidateFetchFile(inFetch string, verbose bool) (bool, bool, int, int) {
 	oxumfiles := 0
 
 	ff, err := os.Open(inFetch)
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 	scanner := bufio.NewScanner(ff)
 	for scanner.Scan() {
 		fetchuri := strings.Fields(scanner.Text())[0]
@@ -223,8 +249,15 @@ func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, 
 		for _, tmentry := range *tagmanifests {
 			//tmpfd, err := os.Open(*srcDir + string(os.PathSeparator) + tmentry)
 			tmpfd, err := os.Open(*srcDir + tmentry)
-			e(err)
-			defer tmpfd.Close()
+			if err != nil {
+				log.Fatalf("ERROR: %s", err.Error())
+			}
+			defer func(tmpfd *os.File) {
+				err := tmpfd.Close()
+				if err != nil {
+					log.Printf("WARNING: %s", err.Error())
+				}
+			}(tmpfd)
 			tmphashalg := strings.Split(strings.Split(tmentry, "-")[1], ".")[0]
 
 			if verbose {
@@ -235,7 +268,9 @@ func ValidateTagmanifests(srcDir *string, tagmanifests *[]string, verbose bool, 
 			for scanner.Scan() {
 				tmptagfile := strings.Split(scanner.Text(), " ")[1]
 				tmptagstat, err := os.Lstat(*srcDir + string(os.PathSeparator) + tmptagfile)
-				e(err)
+				if err != nil {
+					log.Fatalf("ERROR: %s", err.Error())
+				}
 
 				if !tmptagstat.IsDir() {
 					if verbose {

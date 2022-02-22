@@ -1,37 +1,38 @@
 package main
 
 import (
-	"flag"
 	"log"
 	"os"
 	"time"
 
+	flag "github.com/spf13/pflag"
 	"github.com/steffenfritz/bagit"
 )
 
-const version = "0.4.0"
+var Version string
+var Build string
 
 var starttime = time.Now().Format("2006-01-02T150405")
 
 func main() {
 	b := bagit.New()
 
-	vers := flag.Bool("version", false, "Print version")
-	validate := flag.String("validate", "", "Validate bag. Expects path to bag")
-	b.SrcDir = flag.String("create", "", "Create bag. Expects path to source directory")
-	b.OutDir = flag.String("output", "bag_"+starttime, "Output directory for bag. Used with create flag")
-	tarit := flag.Bool("tar", false, "Create a tar archive when creating a bag")
-	b.HashAlg = flag.String("hash", "sha512", "Hash algorithm used for manifest file when creating a bag [sha1, sha256, sha512, md5]")
-	verbose := flag.Bool("v", false, "Verbose output")
-	b.AddHeader = flag.String("header", "", "Additional headers for bag-info.txt. Expects path to json file")
-	b.FetchFile = flag.String("fetch", "", "Adds optional fetch file to bag. Expects path to fetch.txt file and switch manifetch")
-	b.FetchManifest = flag.String("manifetch", "", "Path to manifest file for optional fetch.txt file. Mandatory if fetch switch is used")
-	b.TagManifest = flag.String("tagmanifest", "", "Hash algorithm used for tag manifest file [sha1, sha256, sha512, md5]")
+	vers := flag.BoolP("version", "", false, "Print version")
+	validate := flag.StringP("validate", "V", "", "Validate bag. Expects path to bag")
+	b.SrcDir = flag.StringP("create", "C", "", "Create bag. Expects path to source directory")
+	b.OutDir = flag.StringP("output", "O", "bag_"+starttime, "Output directory for bag. Used with create flag")
+	tarit := flag.BoolP("tar", "T", false, "Create a tar archive when creating a bag")
+	b.HashAlg = flag.StringP("hash", "H", "sha512", "Hash algorithm used for manifest file when creating a bag [sha1, sha256, sha512, md5]")
+	verbose := flag.BoolP("verbose", "v", false, "Verbose output")
+	b.AddHeader = flag.StringP("header", "J", "", "Additional headers for bag-info.txt. Expects path to json file")
+	b.FetchFile = flag.StringP("fetch", "F", "", "Adds optional fetch file to bag. Expects path to fetch.txt file and switch manifetch")
+	b.FetchManifest = flag.StringP("manifetch", "M", "", "Path to manifest file for optional fetch.txt file. Mandatory if fetch switch is used")
+	b.TagManifest = flag.StringP("tagmanifest", "t", "", "Hash algorithm used for tag manifest file [sha1, sha256, sha512, md5]")
 
 	flag.Parse()
 
 	if *vers {
-		log.Println("Version: " + version)
+		log.Println("Version: " + Version + " Build: " + Build)
 
 		return
 	}
@@ -98,10 +99,14 @@ func main() {
 
 		b.Oxum.Bytes = int64(fetchoxumbytes)
 		b.Oxum.Filecount = fetchoxumfiles
-		b.Create(*verbose)
+		err = b.Create(*verbose)
+		if err != nil {
+			log.Fatalf("ERROR: %s", err.Error())
+		}
 
 		if *tarit {
-			b.Tarit(*b.OutDir, *b.OutDir+".tar.gz")
+			err = b.Tarit(*b.OutDir, *b.OutDir+".tar.gz")
+			log.Fatalf("ERROR: %s", err.Error())
 		}
 
 		return

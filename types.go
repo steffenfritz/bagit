@@ -4,6 +4,7 @@ import (
 	"crypto"
 )
 
+//goland:noinspection GoNameStartsWithPackageName
 const (
 	// BagitVer is the version of the bagit spec this library coresponds to
 	BagitVer = "1.0"

@@ -13,8 +13,15 @@ import (
 
 func hashit(inFile string, hashalg string) []byte {
 	fd, err := os.Open(inFile)
-	e(err)
-	defer fd.Close()
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
+	defer func(fd *os.File) {
+		err := fd.Close()
+		if err != nil {
+			log.Printf("WARNING: %s", err.Error())
+		}
+	}(fd)
 
 	var hasher hash.Hash
 
@@ -36,7 +43,9 @@ func hashit(inFile string, hashalg string) []byte {
 	}
 
 	_, err = io.Copy(hasher, fd)
-	e(err)
+	if err != nil {
+		log.Fatalf("ERROR: %s", err.Error())
+	}
 
 	checksum := hasher.Sum(nil)
 
