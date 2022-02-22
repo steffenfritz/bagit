@@ -5,19 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="15b3dbb3-068a-432d-837f-719068483b0c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/gobagit/gobagit.1" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gobagit/gobagit.1" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cmd/gobagit/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/cmd/gobagit/main.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/copy.go" beforeDir="false" afterPath="$PROJECT_DIR$/copy.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create.go" beforeDir="false" afterPath="$PROJECT_DIR$/create.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/err.go" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.mod" beforeDir="false" afterPath="$PROJECT_DIR$/go.mod" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/go.sum" beforeDir="false" afterPath="$PROJECT_DIR$/go.sum" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/hash.go" beforeDir="false" afterPath="$PROJECT_DIR$/hash.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tarit.go" beforeDir="false" afterPath="$PROJECT_DIR$/tarit.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/types.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/validate.go" beforeDir="false" afterPath="$PROJECT_DIR$/validate.go" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

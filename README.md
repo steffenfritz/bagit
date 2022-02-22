@@ -45,27 +45,39 @@ Pass additional headers as a json file, no nesting supported. Example:
 
 Commandline options:
 
-    -create PATH_TO_DIR
-        Create bag. Expects path to source directory
-    -fetch string
-        Adds optional fetch file to bag. Expects path to fetch.txt file and switch manifetch
-    -hash ALGORITHM
-        Hash algorithm used for manifest file when creating a bag [sha1, sha256, sha512, md5] (default "sha512")
-    -header PATH_TO_FILE
-        Additional headers for bag-info.txt. Expects path to json file
-    -manifetch string
-        Path to manifest file for optional fetch.txt file. Mandatory if fetch switch is used
-    -output PATH_TO_DIR
-        Output directory for bag. Used with create flag (default "bag_2019-06-11T225839")
-    -tagmanifest ALGORITHM
-        Hash algorithm used for tagmanifest file when creating a bag [sha1, sha256, sha512, md5] (default "sha512")
-    -tar
-        Create a tar archive when creating a bag
-    -v    Verbose output
-    -validate PATH_TO_BAG
-        Validate bag. Expects path to bag
-    -version
-        Print version
+       --create, -C
+               Create bag. Expects path to source directory
+
+       --fetch, -F
+               Adds optional fetch file to bag. Expects path to fetch.txt file and flag manifetch
+
+       --hash, -H
+               Hash algorithm used for manifest file when creating a bag
+
+       --header, -J
+               Additional headers for bag-info.txt. Expects path to json file
+
+       --manifetch, -M
+               Path to manifest file for optional fetch.txt file. Mandatory if fetch switch is used
+
+       --output, -O
+               Output directory for bag. Used with create flag
+
+       --tagmanifest, -t
+               Hash algorithm used for tag manifest file
+
+       --tar, -T
+               Create a tar archive when creating a bag
+
+       --validate, -V
+               Validate bag. Expects path to bag
+
+       --verbose, -v
+               Verbose output
+       
+       --version
+               Print version
+
 
 
 # Installation
